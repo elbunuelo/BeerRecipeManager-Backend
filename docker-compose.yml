@@ -1,0 +1,25 @@
+version: '3'
+volumes:
+    pg_data:
+services:
+    db:
+        image: mdillon/postgis
+        environment:
+            - POSTGRES_PASSWORD=dev
+            - POSTGRES_USER=final
+            - POSTGRES_DB=final
+        ports:
+            - "6155:5432"
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+    web:
+        build: .
+        stdin_open: true
+        tty: true
+        command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -e development -p 3000 -b '0.0.0.0'"
+        volumes:
+            - .:/final
+        ports:
+            - "3333:3000"
+        depends_on:
+            - db
